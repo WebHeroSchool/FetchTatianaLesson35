@@ -1,9 +1,29 @@
-/*fetch('https://api.github.com/users/Tatiana20th');
-  .then (res => res.json());
-  .then(json => console.log(json.url));
-  .then(json => console.log(json.avatar_url, json.url));
-  .catch(err => console.log(err));
-  .catch(error => console.error(error));*/
+/*const name = 'Tatiana20th';
+const url = 'https://api.github.com/users/';
+const log = console.log;*/
+
+/*const getName = () => setTimeout(() => name ? log(name) : log('Иия не найдено'), 3000);
+const getUrl = () => setTimeout (() => url ? log(url) : log('Ccылка не найдена'), 2000);
+
+fetch(`${url}${name}`)
+  .then(res => res.json())
+  .then(json => log(json.avatar_url))
+  .catch(err => log(err)); */
+
+
+/*const getName = new Promise((resolve, reject) => {
+	setTimeout(() => name ? resolve(name) : reject('Имя не найдено'), 3000);
+});
+
+const getUrl = new Promise((resolve, reject) => {
+	setTimeout(() => url ? resolve(url) : reject('Ccылка не найдена'), 2000);
+});
+
+Promise.all([getName, getUrl])
+  .then(([name, url]) => fetch(`${url}${name}`))
+  .then(res => res.json())
+  .then(json => log(json.avatar_url))
+  .catch(err => log(err));*/
 
 let url = window.location.toString();
 
@@ -18,8 +38,20 @@ let getUsername = (url) => {
 
 let name = getUsername(url);
 
-fetch('https://api.github.com/users/' + name)
-    .then(res => res.json())
+let getNewDate = new Promise((resolve, reject) => {
+	let newDate = new Date();
+	setTimeout(() => newDate ? resolve(newDate) : reject('Ошибка в вычислении времени'), 3000);
+});
+
+let getUserData = fetch('https://api.github.com/users/' + name);
+
+Promise.all([getUserData, getNewDate])
+    .then(([oneUserData, oneNewDate]) => {
+    	userData = oneUserData;
+    	todayDate = oneNewDate;
+    })
+
+    .then(res => userData.json())
     .then(json => {
         let avatar = json.avatar_url;
         let name = json.login;
@@ -50,9 +82,20 @@ fetch('https://api.github.com/users/' + name)
                 elementForLink.appendChild(elementForHeader);
             }
 
+            let addDate = () => {
+            	let newTodayDate = document.createElement('p');
+            	newTodayDate.innerHTML = todayDate;
+            	document.body.appendChild(newTodayDate);
+            }
+
+            let preloader = document.getElementById('circle');
+            preloader.classList.add('hidden');
+
+
             addProfile();
             addBio();
             addAvatar();
+            addDate();
         }
         else {
             alert('Sorry, no information about this user')
